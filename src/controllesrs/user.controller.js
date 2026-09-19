@@ -1,6 +1,6 @@
 import {asyncHandler} from "../utils/asyncHandler.js";
 import {ApiError} from "../utils/ApiError.js"
-import {user} from "../models/user.model.js"
+import {User} from "../model/user.model.js"
 import {uploadOnCloudinary} from "../utils/cloudinary.js"
 import {ApiResponse} from "../utils/ApiRespomse.js"
 
@@ -17,11 +17,11 @@ const registerUser = asyncHandler(async (req, res) => {
 
 
 
-const { fullName , email , usename ,password} =  req.body
+const { fullName , email , username ,password} =  req.body
 console.log("email:", email);
 
 if (
-    [fullName,email,username,password].some((field)) =>
+    [fullName,email,username,password].some((field) =>
     field?.trim() === "")
 ) {
     throw new ApiError(400,"ALL feild are rqeired")
@@ -34,14 +34,14 @@ if (existedUser) {
     throw new ApiError(409,"user with exitx") 
 }
 
- const avatarLocalpath = req.files?avatar[0]?.path;
- const converImageLocalPath =  req.files?.cobcerImage[0]?.patth;
+ const avatarLocalpath = req.files?.avatar[0]?.path;
+ const converImageLocalPath =  req.files?.coverImage[0]?.path;
     
 if (!avatarLocalpath) {
     throw new ApiError(400, "Avstsr id frewww")   
 }
 
- const avatar = await uploadOnCloudinary(avatarLocalpat)
+ const avatar = await uploadOnCloudinary(avatarLocalpath)
  const coverImage = await uploadOnCloudinary
  (converImageLocalPath)
  
@@ -55,7 +55,7 @@ if (!avatarLocalpath) {
     coverImage:coverImage?.url || "",
     email,
     password,
-    username: username.toLowercase()  
+    username: username.toLowerCase()  
   })
        
   const createdUser = await User.findById(user._id).select(
@@ -68,7 +68,7 @@ if (!avatarLocalpath) {
 
   return res.status(201).json(
     new ApiResponse(200,createdUser,"User register full")
-  )
+  )  
 
 
 } );
