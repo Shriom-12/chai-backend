@@ -1,6 +1,5 @@
-import {v2 as cloudinary} from 'cloudinary';
-import fs from 'fs'; 
-
+import { v2 as cloudinary } from "cloudinary";
+import fs from "fs";
 
 cloudinary.config({
     cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -8,24 +7,28 @@ cloudinary.config({
     api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-const uploadToCloudinary = async (localFilePath,) => {
+const uploadOnCloudinary = async (localFilePath) => {
     try {
-        if (!localFilePath) { return null
-           const response = await cloudinary.uploader.upload(localFilePath,{
-                resource_type: "auto",
-            })
-            console.log("File uploaded to Cloudinary:",  
-            response.secure_url);
-            return response;
-            return null;
-                             
-        } catch (error) {
-            fs.unlinkSync(localFilePath);            
+        if (!localFilePath) return null;
 
+        const response = await cloudinary.uploader.upload(localFilePath, {
+            resource_type: "auto",
+        });
+
+        console.log("File uploaded to Cloudinary:", response.secure_url);
+
+        if (fs.existsSync(localFilePath)) {
+            fs.unlinkSync(localFilePath);
+        }
+
+        return response;
+    } catch (error) {
+        if (localFilePath && fs.existsSync(localFilePath)) {
+            fs.unlinkSync(localFilePath);
+        }
+        console.error("Cloudinary upload failed:", error);
+        return null;
     }
+};
 
-    export { uploadToCloudinary }
-cludinary.v2.uploader.upload("https://upload.wikimedia.
-org/wikipedia/commons/a/ae/Olympic_flag.jpg",
-{public_id: "olympic_flag"}, 
-function(error, result) {console.log(result, error);}
+export { uploadOnCloudinary };
